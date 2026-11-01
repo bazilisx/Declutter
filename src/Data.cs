@@ -15,6 +15,9 @@ namespace Declutter
         {
             string c = WikiData.Items.TryGetValue(item.name, out var w) ? w.category : "";
             if (c == "" && Biomes.FermentsTo(item.name) is ItemDrop mead && mead != item) return Of(mead); // mead bases take their mead's group
+            // Uncooked/raw items and feast materials take the food they become (Oven Pancake Batter -> Oven Pancake: Eitr).
+            if (c == "" && FoodItBecomes(item) is ItemDrop food) return Of(food);
+            if (c == "Food > Feast") c = "Food"; // feasts go by their own stats (Black Forest Buffet: 35/35 -> Balanced)
             if (c == "" || c == "Food") c = Fallback(item.m_itemData.m_shared); // not on wiki, or wiki gives no food type
             if (c == "Armor > Body") c = "Armor > Chest"; // shown as Chest, matching the game's own slot name
             if (c == "Misc Items > Forsaken offerings") c = "Misc Items > Boss"; // Bell, Sealbreaker
@@ -30,6 +33,13 @@ namespace Declutter
                 if (kind != null) path = "Materials > Casts: " + kind;
             }
             return path;
+        }
+
+        // What a crafted item cooks/bakes into, or the feast a feast material places, when that's a food.
+        static ItemDrop FoodItBecomes(ItemDrop item)
+        {
+            var next = Biomes.ProductOf(item.name) ?? item.m_itemData.m_shared.m_appendToolTip; // feasts link their stats this way
+            return next && next != item && Group(Of(next)) == "Food" ? next : null;
         }
 
         // Axes made for harvesting first (weapon second) also show under Tools; they stay sorted with the weapons.
@@ -127,6 +137,7 @@ namespace Declutter
                 case ItemDrop.ItemData.ItemType.Trinket: return "Trinket";
                 case ItemDrop.ItemData.ItemType.Ammo:
                 case ItemDrop.ItemData.ItemType.AmmoNonEquipable:
+                    if ((s.m_ammoType ?? "").IndexOf("bait", StringComparison.OrdinalIgnoreCase) >= 0) return "Bait"; // fishing bait is ammo to the game
                     if (s.m_ammoType == "$ammo_arrows") return "Weapons > Arrows";
                     if (s.m_ammoType == "$ammo_bolts") return "Weapons > Bolts";
                     return "Weapons > Missiles";
@@ -162,6 +173,9 @@ namespace Declutter
         static readonly Dictionary<string, int> cache = new Dictionary<string, int>();
         static Dictionary<string, int> overrides, natural;
         static Dictionary<string, List<Recipe>> recipesFor;
+        static Dictionary<string, Piece> stationPieces;
+        static Dictionary<string, List<Piece>> upgradesOf;
+        static readonly Dictionary<string, int> stationCache = new Dictionary<string, int>();
         static Dictionary<string, List<string>> conversionsFor;
         static readonly Dictionary<string, ItemDrop> fermentsTo = new Dictionary<string, ItemDrop>(), convertsTo = new Dictionary<string, ItemDrop>();
 
@@ -179,6 +193,7 @@ namespace Declutter
         public static void Reset()
         {
             cache.Clear();
+            stationCache.Clear();
             fermentsTo.Clear();
             convertsTo.Clear();
             natural = null;
@@ -198,27 +213,105 @@ namespace Declutter
 
         static bool Wiki(string prefab, out int tier)
         {
-            tier = WikiData.Items.TryGetValue(prefab, out var w) ? RankOfLabel(w.biome) : Unknown;
+            tier = corrections.TryGetValue(prefab, out var c) ? Rank(c)
+                : WikiData.Items.TryGetValue(prefab, out var w) ? RankOfLabel(w.biome) : Unknown;
             return tier != Unknown;
         }
+
+        // Where the wiki data's biome is wrong for when an item can first be crafted or bought (checked 2026-11-01).
+        // Station-gated items keep their vanilla station's biome even if a mod moves the recipe to an earlier station.
+        static readonly Dictionary<string, Biome> corrections = new Dictionary<string, Biome>
+        {
+            // Crafting station unlocks later than the ingredients
+            ["BoltBone"] = Biome.Mistlands,            // Black Forge
+            ["BoltIron"] = Biome.Mistlands,            // Black Forge
+            ["BoltBlackmetal"] = Biome.Mistlands,      // Black Forge
+            ["CrossbowArbalest"] = Biome.Mistlands,    // Black Forge
+            ["KnifeSkollAndHati"] = Biome.Mistlands,   // Black Forge
+            ["Lantern"] = Biome.Mistlands,             // Dvergr Lantern: Black Forge
+            ["TurretBoltWood"] = Biome.Mountain,       // Wooden Missile: Artisan Table (Dragon Tear)
+            ["FishingBaitForest"] = Biome.Swamp,       // Food Preparation Table (Iron)
+            ["FishingBaitOcean"] = Biome.Swamp,        // Food Preparation Table (Iron)
+            ["FishRaw"] = Biome.Swamp,                 // Food Preparation Table (Iron)
+            ["CeramicPlate"] = Biome.Mistlands,        // Artisan Press needs the Queen's carapace
+            ["ShieldCore"] = Biome.Mistlands,          // Artisan Table level 2; craftable before the Ashlands
+            // Trader stock that unlocks after a boss or one of Hildir's chests
+            ["FireworksRocket_White"] = Biome.Plains,  // Hildir, after the bronze chest (Sealed Tower)
+            ["FireworksRocket_Cyan"] = Biome.Plains,   // Basic Fireworks + Greydwarf Eye
+            ["Thunderstone"] = Biome.BlackForest,      // Haldor, after The Elder
+            ["BarrelRings"] = Biome.BlackForest,       // Haldor
+            ["CandleWick"] = Biome.Swamp,              // Bog Witch
+            ["MushroomBzerker"] = Biome.Mountain,      // Toadstool: Bog Witch, after Moder
+            ["FragrantBundle"] = Biome.Mountain,       // Bog Witch, after Moder
+            ["ScytheHandle"] = Biome.Mountain,         // Bog Witch, after Moder
+            ["SpiceMountains"] = Biome.Mountain,       // Bog Witch, after Moder
+            ["SpicePlains"] = Biome.Plains,            // Bog Witch, after Yagluth
+            ["SpiceMistlands"] = Biome.Mistlands,      // Bog Witch, after The Queen
+            ["SpiceAshlands"] = Biome.AshLands,        // Bog Witch, after Fader
+            ["SpiceDeepNorth"] = Biome.DeepNorth,      // Bog Witch, after Kall Fimbulbringer
+        };
 
         public static bool FromWiki(Recipe r) => Wiki(r.m_item.name, out _) && !overrides.ContainsKey(r.m_item.name);
 
         public static int OfRecipe(Recipe r)
         {
             Build();
-            string name = r.m_item.name;
-            if (overrides.TryGetValue(name, out int t)) return t;
+            if (overrides.TryGetValue(r.m_item.name, out int t)) return t;
+            if (feasts.TryGetValue(r.m_item.name, out var feast)) return Rank(feast);
+            // Nor before the station it's crafted at can be built. Vanilla station gates are already in the corrections,
+            // so this only moves items a mod puts on a later station, and mod-only items.
+            return MaxKnown(WithoutStation(r), StationTier(r.m_craftingStation, r.m_minStationLevel));
+        }
+
+        // Feasts go under the biome they're named for, ahead of the station and ingredient rules
+        // (Black Forest Buffet Platter: Black Forest, not the prep table's Swamp).
+        static readonly Dictionary<string, Biome> feasts = new Dictionary<string, Biome>
+        {
+            ["FeastMeadows_Material"] = Biome.Meadows,
+            ["FeastBlackforest_Material"] = Biome.BlackForest,
+            ["FeastOceans_Material"] = Biome.Ocean,
+            ["FeastSwamps_Material"] = Biome.Swamp,
+            ["FeastMountains_Material"] = Biome.Mountain,
+            ["FeastPlains_Material"] = Biome.Plains,
+            ["FeastMistlands_Material"] = Biome.Mistlands,
+            ["FeastAshlands_Material"] = Biome.AshLands,
+            ["FeastDeepNorth_Material"] = Biome.DeepNorth,
+        };
+
+        static int WithoutStation(Recipe r)
+        {
             int made = Ingredients(r);
             // Never earlier than what it's made from: the wiki lists seasonal Pointy Hat under Meadows, but it needs Bronze.
             // (No recipe in the wiki's own recipe data contradicts its wiki biome, so only recipes
             // the wiki lacks or that mods change can move.)
-            int tier = Wiki(name, out t) ? MaxKnown(t, made) : made;
-            return notBefore.TryGetValue(name, out var b) ? MaxKnown(tier, Rank(b)) : tier;
+            return Wiki(r.m_item.name, out int t) ? MaxKnown(t, made) : made;
         }
 
-        // Raw fish is made at the Food Preparation Table, which needs Iron, so it can't be crafted before the Swamp.
-        static readonly Dictionary<string, Biome> notBefore = new Dictionary<string, Biome> { ["FishRaw"] = Biome.Swamp };
+        // A station's tier is the latest biome among its build materials. Its level counts the different upgrades
+        // built near it, in any order, so level N also needs the N-1 earliest upgrades. Works for modded stations too.
+        static int StationTier(CraftingStation station, int level)
+        {
+            Build();
+            if (!station || !stationPieces.TryGetValue(station.name, out var piece)) return Unknown;
+            string key = station.name + "#" + level;
+            if (stationCache.TryGetValue(key, out int t)) return t;
+            t = PieceTier(piece);
+            if (level > 1 && upgradesOf.TryGetValue(station.name, out var ups))
+            {
+                var tiers = ups.Select(PieceTier).OrderBy(x => x).ToList(); // Unknown sorts last
+                t = MaxKnown(t, tiers[Math.Min(level - 1, tiers.Count) - 1]);
+            }
+            return stationCache[key] = t;
+        }
+
+        static int PieceTier(Piece p)
+        {
+            int t = Unknown;
+            if (p.m_resources != null) // some modded pieces leave this unset
+                foreach (var req in p.m_resources)
+                    if (req != null && req.m_resItem && req.m_amount > 0) t = MaxKnown(t, OfItem(req.m_resItem.name));
+            return t;
+        }
 
         // Only what's needed to craft it: upgrade-only inputs (idols, amount 0 at level 1) don't gate crafting.
         // Raw fish is made from any one fish, so it unlocks with the earliest one, not the latest.
@@ -256,6 +349,8 @@ namespace Declutter
         {
             if (natural != null) return;
             natural = new Dictionary<string, int>();
+            stationPieces = new Dictionary<string, Piece>();
+            upgradesOf = new Dictionary<string, List<Piece>>();
             recipesFor = new Dictionary<string, List<Recipe>>();
             conversionsFor = new Dictionary<string, List<string>>();
             LoadOverrides();
@@ -266,6 +361,10 @@ namespace Declutter
             foreach (var go in ZNetScene.instance.m_prefabs)
             {
                 if (!go) continue;
+                var piece = go.GetComponent<Piece>();
+                if (piece && go.GetComponent<CraftingStation>()) stationPieces[go.name] = piece;
+                var ext = go.GetComponent<StationExtension>();
+                if (piece && ext && ext.m_craftingStation) Add(upgradesOf, ext.m_craftingStation.name, piece);
                 var sm = go.GetComponent<Smelter>();
                 if (sm) foreach (var c in sm.m_conversion) AddConversion(c.m_from, c.m_to);
                 var cook = go.GetComponent<CookingStation>();
@@ -364,7 +463,7 @@ namespace Declutter
             if (dumped || !ObjectDB.instance || !ZNetScene.instance) return;
             dumped = true;
             Build();
-            var lines = new List<string> { "prefab,name,station,enabled,biome,biome_source,category,category_source" };
+            var lines = new List<string> { "prefab,name,station,station_level,station_biome,biome_without_station,enabled,biome,biome_source,category,category_source" };
             foreach (var r in ObjectDB.instance.m_recipes)
             {
                 if (!r || !r.m_item) continue;
@@ -372,6 +471,9 @@ namespace Declutter
                 lines.Add(string.Join(",", r.m_item.name,
                     "\"" + Localization.instance.Localize(r.m_item.m_itemData.m_shared.m_name).Replace("\"", "'") + "\"",
                     r.m_craftingStation ? r.m_craftingStation.name : "(hand)",
+                    r.m_minStationLevel,
+                    r.m_craftingStation ? Label(StationTier(r.m_craftingStation, r.m_minStationLevel)) : "",
+                    Label(WithoutStation(r)),
                     r.m_enabled ? "yes" : "no", // disabled recipes never reach a crafting menu
                     Label(OfRecipe(r)),
                     overrides.ContainsKey(r.m_item.name) ? "override" : FromWiki(r) ? "wiki" : "derived",

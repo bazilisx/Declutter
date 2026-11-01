@@ -19,7 +19,7 @@ namespace Declutter
     {
         public const string Guid = "bazilisx.Declutter";
         public const string Name = "Declutter";
-        public const string Version = "1.0.2";
+        public const string Version = "1.0.3";
 
         internal static BepInEx.Logging.ManualLogSource Log;
         static ConfigEntry<bool> dumpCsv;
@@ -30,8 +30,11 @@ namespace Declutter
         static ConfigEntry<bool> headerIcons;
         static ConfigEntry<string> hiddenBiomesCfg, hiddenGroupsCfg, hiddenSubsCfg, stationSortCfg, collapsedCfg;
 
-        // Persisted state. Sort flags + collapsed headers are per station; hidden lists are shared by all stations.
-        static HashSet<string> hiddenBiomes, hiddenGroups, hiddenSubs;   // biome labels / rail groups / "Group>Sub"
+        // Persisted state, all per station: sort flags, hidden biomes / rail groups / "Group>Sub", collapsed headers.
+        static Dictionary<string, HashSet<string>> hiddenBiomesBy, hiddenGroupsBy, hiddenSubsBy;
+        static HashSet<string> hiddenBiomes => ForStation(hiddenBiomesBy);
+        static HashSet<string> hiddenGroups => ForStation(hiddenGroupsBy);
+        static HashSet<string> hiddenSubs => ForStation(hiddenSubsBy);
         static Dictionary<string, string> stationSort;                   // station -> any of "BCAK" (Biome, Category, Alphabetical, K = craftable first)
         static Dictionary<string, HashSet<string>> collapsed;            // station -> collapsed biome headers
 
@@ -207,24 +210,43 @@ namespace Declutter
 
         static void LoadState()
         {
-            hiddenBiomes = new HashSet<string>(Split(hiddenBiomesCfg.Value, ','));
-            hiddenGroups = new HashSet<string>(Split(hiddenGroupsCfg.Value, ','));
-            hiddenSubs = new HashSet<string>(Split(hiddenSubsCfg.Value, ','));
+            hiddenBiomesBy = PerStation(hiddenBiomesCfg.Value);
+            hiddenGroupsBy = PerStation(hiddenGroupsCfg.Value);
+            hiddenSubsBy = PerStation(hiddenSubsCfg.Value);
+            collapsed = PerStation(collapsedCfg.Value);
             stationSort = new Dictionary<string, string>();
-            collapsed = new Dictionary<string, HashSet<string>>();
             foreach (var kv in Split(stationSortCfg.Value, ';').Select(s => s.Split('=')).Where(p => p.Length == 2))
                 stationSort[kv[0]] = kv[1];
-            foreach (var kv in Split(collapsedCfg.Value, ';').Select(s => s.Split('=')).Where(p => p.Length == 2))
-                collapsed[kv[0]] = new HashSet<string>(Split(kv[1], '|'));
         }
 
         static void SaveState()
         {
-            hiddenBiomesCfg.Value = string.Join(",", hiddenBiomes);
-            hiddenGroupsCfg.Value = string.Join(",", hiddenGroups);
-            hiddenSubsCfg.Value = string.Join(",", hiddenSubs);
+            hiddenBiomesCfg.Value = PerStation(hiddenBiomesBy);
+            hiddenGroupsCfg.Value = PerStation(hiddenGroupsBy);
+            hiddenSubsCfg.Value = PerStation(hiddenSubsBy);
+            collapsedCfg.Value = PerStation(collapsed);
             stationSortCfg.Value = string.Join(";", stationSort.Where(kv => kv.Value != "").Select(kv => kv.Key + "=" + kv.Value));
-            collapsedCfg.Value = string.Join(";", collapsed.Where(kv => kv.Value.Count > 0).Select(kv => kv.Key + "=" + string.Join("|", kv.Value)));
+        }
+
+        // "station=a|b;station2=c". Up to 1.0.2 the filters were one list for every station ("a,b"): that becomes the
+        // starting point ("*") each station copies the first time it's opened.
+        static Dictionary<string, HashSet<string>> PerStation(string v)
+        {
+            var d = new Dictionary<string, HashSet<string>>();
+            if (v != "" && v.IndexOf('=') < 0) d["*"] = new HashSet<string>(Split(v, ','));
+            else foreach (var kv in Split(v, ';').Select(s => s.Split('=')).Where(p => p.Length == 2))
+                d[kv[0]] = new HashSet<string>(Split(kv[1], '|'));
+            return d;
+        }
+        static string PerStation(Dictionary<string, HashSet<string>> d) =>
+            string.Join(";", d.Where(kv => kv.Value.Count > 0).Select(kv => kv.Key + "=" + string.Join("|", kv.Value)));
+
+        // This station's set, created on first use from the old shared list if there was one.
+        static HashSet<string> ForStation(Dictionary<string, HashSet<string>> d)
+        {
+            string k = Station();
+            if (!d.TryGetValue(k, out var s)) d[k] = s = d.TryGetValue("*", out var old) ? new HashSet<string>(old) : new HashSet<string>();
+            return s;
         }
 
         static string[] Split(string s, char sep) => s.Split(new[] { sep }, StringSplitOptions.RemoveEmptyEntries);
@@ -238,12 +260,7 @@ namespace Declutter
         static string Flags() => stationSort.TryGetValue(Station(), out var f) ? f : "";
         static bool On(char flag) => Flags().IndexOf(flag) >= 0;
 
-        static HashSet<string> Collapsed()
-        {
-            string k = Station();
-            if (!collapsed.TryGetValue(k, out var s)) collapsed[k] = s = new HashSet<string>();
-            return s;
-        }
+        static HashSet<string> Collapsed() => ForStation(collapsed);
 
         static void Toggle(HashSet<string> set, string key)
         {
@@ -259,19 +276,35 @@ namespace Declutter
 
         // ---- grouping ----
 
-        static List<Recipe> Available()
+        // What the game lists at the current station, before our filters, so the rail and checklists only offer
+        // what can be made here. (GetAvailableRecipes isn't per-station: with nocost it returns every recipe.)
+        static List<Recipe> stationRecipes = new List<Recipe>();
+        static List<Recipe> Available() => stationRecipes;
+
+        // Every recipe made at the current station, known or not, so kitchen vs gear is the same for every player
+        // and world (and with nocost on or off). Cached per station.
+        static readonly Dictionary<string, List<Recipe>> books = new Dictionary<string, List<Recipe>>();
+        static List<Recipe> StationBook()
         {
-            var all = new List<Recipe>();
-            Player.m_localPlayer.GetAvailableRecipes(ref all);
-            return all.Where(r => r.m_item).ToList();
+            var station = Player.m_localPlayer ? Player.m_localPlayer.GetCurrentCraftingStation() : null;
+            string key = station ? station.m_name : "";
+            if (!books.TryGetValue(key, out var book) || book.Count == 0)
+                books[key] = book = ObjectDB.instance.m_recipes.Where(r => r && r.m_enabled && r.m_item &&
+                    (station ? r.m_craftingStation && r.m_craftingStation.m_name == key : !r.m_craftingStation)).ToList();
+            return book;
         }
 
         static bool IsFoodRecipe(Recipe r) =>
             Categories.Group(Categories.Of(r.m_item)) == "Food" || Categories.IsFood(r.m_item.m_itemData.m_shared);
 
-        // Cauldron, prep table and modded kitchens: mostly food -> the rail shows the five food types.
-        static bool FoodStation(List<Recipe> recipes) =>
-            recipes.Count > 0 && recipes.Count(r => r.m_item && IsFoodRecipe(r)) * 2 >= recipes.Count(r => r.m_item);
+        // Cauldron, prep table and modded kitchens: some food, and no more weapons/armor than food -> the rail shows
+        // the five food types. Bait and raw fish don't count against it, so the prep table stays a kitchen.
+        static bool FoodStation(List<Recipe> recipes)
+        {
+            int food = recipes.Count(IsFoodRecipe);
+            int gear = recipes.Count(r => Categories.RailGroup(r.m_item, false, false) is var g && (g == "Weapons" || g == "Armor"));
+            return food > 0 && food >= gear;
+        }
 
         // Mead Ketill (and modded kettles): mostly mead bases -> the rail shows the wiki's mead groups.
         static bool MeadStation(List<Recipe> recipes) =>
@@ -1267,6 +1300,7 @@ namespace Declutter
             static void Postfix()
             {
                 Biomes.Reset();
+                books.Clear();
                 originalOffsets.Clear(); // a new inventory UI: the old rects are gone
                 descScroll = null;
             }
@@ -1310,8 +1344,10 @@ namespace Declutter
                 {
                     if (dumpCsv.Value) Biomes.DumpOnce();
                     if (!__instance.InCraftTab()) return;
-                    meadStation = MeadStation(recipes);
-                    foodStation = !meadStation && FoodStation(recipes);
+                    stationRecipes = recipes.Where(r => r && r.m_item).ToList();
+                    var book = StationBook();
+                    meadStation = MeadStation(book);
+                    foodStation = !meadStation && FoodStation(book);
                     bool searching = !string.IsNullOrWhiteSpace(search);
                     recipes = recipes.Where(r => r.m_item && !Hidden(r) && (!searching || MatchesSearch(r))).ToList();
                 }

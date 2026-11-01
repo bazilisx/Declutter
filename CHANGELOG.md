@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3
+- Several recipes reorganized by biome and requisite workstation.
+- Fixed bug where biome, category and sub-category toggles were not being saved per station.
+- Fixed bug where subcategory checklists in Hammer mode or with "nocost" enabled in the developer console were showing all possible categories, including those unrelated to that station. Armor crafted at a food preparation table probably won't stop many arrows.
+
 ## 1.0.2
 - "Alphabetical" now sorts the entire list A-Z, and is no longer superseded by category filters.
 - Pointy Hat moved to Black Forest biome because Black Forest is spookier (and because Pointy Hat requires bronze).

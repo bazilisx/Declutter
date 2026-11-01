@@ -176,7 +176,7 @@ A search box at the top of the list filters by item name in real-time as you typ
 
 Vanilla biomes and categories come from the [Valheim Wiki](https://valheim.weirdgloop.org/). Items the wiki doesn't cover, including items from other mods, follow the same rules:
 
-- **Craftable items** take the latest biome among their ingredients. A sword made with Black Metal is a Plains item, available only after you unlock black metal.
+- **Craftable items** take the latest biome among their ingredients and the crafting station (and upgrade level) needed to make them. A sword made with Black Metal is a Plains item, available only after you unlock black metal.
 - **Raw materials** take the earliest biome they spawn or drop in.
 - **Categories** come from the item's type, weapon skill, armor slot or food stats.
 
