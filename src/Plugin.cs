@@ -12,13 +12,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace CraftingAndCookingDecluttered
+namespace Declutter
 {
     [BepInPlugin(Guid, Name, Version)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string Guid = "bazilisx.CraftingAndCookingDecluttered";
-        public const string Name = "Crafting and Cooking Decluttered";
+        public const string Guid = "bazilisx.Declutter";
+        public const string Name = "Declutter";
         public const string Version = "1.0.0";
 
         internal static BepInEx.Logging.ManualLogSource Log;
@@ -112,7 +112,7 @@ namespace CraftingAndCookingDecluttered
             headerIcons = Setting(listSec, "Header icons", true, "Show the biome icon in front of each header.");
             headerIconScale = Setting(listSec, "Header icon size %", 100, "Size of the biome icon in each header.", new AcceptableValueRange<int>(50, 150));
             headerIconGap = Setting(listSec, "Header icon gap", 5, "Space between a header's icon and its text, in pixels.", new AcceptableValueRange<int>(0, 20));
-            dumpCsv = Config.Bind(adv, "DumpCsv", false, new ConfigDescription("Write BepInEx/config/CraftingAndCookingDecluttered.dump.csv the first time a crafting menu opens, listing every recipe's biome and category and where each came from. Handy for bug reports and for writing overrides.", null, new ConfigurationManagerAttributes { Order = order--, IsAdvanced = true }));
+            dumpCsv = Config.Bind(adv, "DumpCsv", false, new ConfigDescription("Write BepInEx/config/Declutter.dump.csv the first time a crafting menu opens, listing every recipe's biome and category and where each came from. Handy for bug reports and for writing overrides.", null, new ConfigurationManagerAttributes { Order = order--, IsAdvanced = true }));
             toolbarOffset = Setting(adv, "ToolbarOffset", Vector2.zero, "Nudge the sort/biome toolbar (pixels) if it sits in the wrong spot.");
             railOffset = Setting(adv, "CategoryOffset", Vector2.zero, "Nudge the category buttons (pixels) if it sits in the wrong spot.");
             var hidden = new ConfigurationManagerAttributes { Browsable = false };

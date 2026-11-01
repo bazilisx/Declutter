@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using Biome = Heightmap.Biome;
 
-namespace CraftingAndCookingDecluttered
+namespace Declutter
 {
     // Category paths are "Group > Sub" using the wiki's own category names (see WikiData.cs).
     // Single-level wiki categories (Trinket, Accessories, ...) use the group name as the sub too.
@@ -142,7 +142,7 @@ namespace CraftingAndCookingDecluttered
     }
 
     // Biome tier, in the wiki's order (MaterialsNav): Meadows, Black Forest, Ocean, Swamp, ... Deep North.
-    //   1. CraftingAndCookingDecluttered.overrides.txt
+    //   1. Declutter.overrides.txt
     //   2. WikiData.cs (wiki navboxes, item-page "X-tier" statements, creature locations, wiki recipes)
     //   3. Not on the wiki (modded): same rule the wiki data uses -- latest biome among recipe ingredients;
     //      raw modded drops take the earliest biome they spawn/grow in, read from the live world tables.
@@ -333,15 +333,15 @@ namespace CraftingAndCookingDecluttered
             if (des) Drops(des.m_spawnWhenDestroyed, rank, depth + 1);
         }
 
-        // BepInEx/config/CraftingAndCookingDecluttered.overrides.txt -- "PrefabName = Biome", one per line. Wins over everything.
+        // BepInEx/config/Declutter.overrides.txt -- "PrefabName = Biome", one per line. Wins over everything.
         static void LoadOverrides()
         {
             overrides = new Dictionary<string, int>();
-            string path = Path.Combine(Plugin.ConfigDir, "CraftingAndCookingDecluttered.overrides.txt");
+            string path = Path.Combine(Plugin.ConfigDir, "Declutter.overrides.txt");
             if (!File.Exists(path))
             {
                 File.WriteAllText(path,
-                    "# Force an item's biome. Use the prefab name from CraftingAndCookingDecluttered.dump.csv.\n" +
+                    "# Force an item's biome. Use the prefab name from Declutter.dump.csv.\n" +
                     "# Biomes: Meadows, BlackForest, Ocean, Swamp, Mountain, Plains, Mistlands, AshLands, DeepNorth\n" +
                     "# Example:\n# SomeModdedOre = Mountain\n");
                 return;
@@ -374,7 +374,7 @@ namespace CraftingAndCookingDecluttered
                     Categories.Of(r.m_item),
                     wikiCat ? "wiki" : "derived"));
             }
-            File.WriteAllLines(Path.Combine(Plugin.ConfigDir, "CraftingAndCookingDecluttered.dump.csv"), lines);
+            File.WriteAllLines(Path.Combine(Plugin.ConfigDir, "Declutter.dump.csv"), lines);
         }
     }
 }

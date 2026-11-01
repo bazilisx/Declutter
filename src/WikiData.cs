@@ -8,7 +8,7 @@
 // Category = wiki category membership ("Group > Sub"); empty = not categorised on the wiki.
 using System.Collections.Generic;
 
-namespace CraftingAndCookingDecluttered
+namespace Declutter
 {
     static class WikiData
     {
