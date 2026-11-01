@@ -6,7 +6,7 @@ param(
 )
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
-dotnet build "$root\src\CraftingAndCookingDecluttered.csproj" -c Release "-p:ValheimDir=$ValheimDir" "-p:BepInExCore=$BepInExCore"
+dotnet build "$root\src\Declutter.csproj" -c Release "-p:ValheimDir=$ValheimDir" "-p:BepInExCore=$BepInExCore"
 if ($LASTEXITCODE -ne 0) { throw "build failed" }
 
 $version = (Get-Content "$root\manifest.json" -Raw | ConvertFrom-Json).version_number
@@ -15,11 +15,11 @@ Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory "$stage\plugins" | Out-Null
 Copy-Item "$root\manifest.json", "$root\README.md", "$root\CHANGELOG.md" $stage
 Copy-Item "$root\art\Icon.png" "$stage\icon.png"
-Copy-Item "$root\src\bin\Release\netstandard2.1\CraftingAndCookingDecluttered.dll" "$stage\plugins"
+Copy-Item "$root\src\bin\Release\netstandard2.1\Declutter.dll" "$stage\plugins"
 Copy-Item "$root\licenses" "$stage\plugins\licenses" -Recurse
 Copy-Item "$root\LICENSE" "$stage\plugins\licenses\LICENSE.txt"
 
-$zip = "$root\release\Crafting_and_Cooking_Decluttered-$version.zip"
+$zip = "$root\release\Declutter-$version.zip"
 Remove-Item $zip -ErrorAction SilentlyContinue
 # Compress-Archive on Windows PowerShell writes backslash paths, so entries are added by hand.
 Add-Type -AssemblyName System.IO.Compression.FileSystem

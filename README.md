@@ -1,4 +1,4 @@
-<p><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/hero.jpg" alt="Crafting and Cooking Decluttered at the black forge"></p>
+<p><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/hero.jpg" alt="Declutter at the black forge"></p>
 
 Cut through the clutter and find what you need faster. Sort, filter, and search every crafting and cooking menu by category, biome, and availability. Works at every crafting station, including cauldrons and ketills, and tons of other modded stations. Look out, Marie Kondo.
 
@@ -27,18 +27,18 @@ The primary toolbar lives under the Craft and Upgrade tabs on the main crafting 
 - a search bar above the crafting window
 - a vertical column of category filter buttons.
 
-<p><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/toolbar.png" width="500" alt="Forge crafting screen with the primary toolbar under the Craft and Upgrade tabs"></p>
+<p><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/toolbar.png" width="500" alt="Forge crafting screen with the primary toolbar under the Craft and Upgrade tabs"></p>
 
 
 ### 1a. Sort buttons
 
-<p><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/toolbar-left.png" width="700" alt="The four sort buttons, outlined"></p>
+<p><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/toolbar-left.png" width="700" alt="The four sort buttons, outlined"></p>
 
 Toggle on and off the **four sort buttons** (Alphabetical, Category, Craftable, and Biome) in any order or combination to get started.
 
 <table>
 <tr>
-<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/btn-az.png" width="100" alt="Alphabetical"></td>
+<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/btn-az.png" width="100" alt="Alphabetical"></td>
 <td>
 
 **Sort: Alphabetically**<br>
@@ -47,7 +47,7 @@ Sorts A-Z within each section. Toggle it off to view the vanilla sort order, per
 </td>
 </tr>
 <tr>
-<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/btn-category.png" width="100" alt="Category"></td>
+<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/btn-category.png" width="100" alt="Category"></td>
 <td>
 
 **Sort by: Category**<br>
@@ -56,7 +56,7 @@ Shows the category buttons beside the list.
 </td>
 </tr>
 <tr>
-<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/btn-craftable.png" width="100" alt="Craftable first"></td>
+<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/btn-craftable.png" width="100" alt="Craftable first"></td>
 <td>
 
 **Sort by: Craftable first**<br>
@@ -65,7 +65,7 @@ If you've currently got the materials, sorts any recipes you can currently craft
 </td>
 </tr>
 <tr>
-<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/btn-biome.png" width="100" alt="Biome"></td>
+<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/btn-biome.png" width="100" alt="Biome"></td>
 <td>
 
 **Sort by: Biome**<br>
@@ -77,7 +77,7 @@ Reorganizes recipes under the biomes where they're unlocked: Meadows, Black Fore
 
 ### 1b. Biome toggles
 
-<p><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/toolbar-right.png" width="700" alt="The nine biome toggles, outlined"></p>
+<p><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/toolbar-right.png" width="700" alt="The nine biome toggles, outlined"></p>
 
 Nine buttons on the right side of the menu let you reorganize any craft station's recipes based on the biome where those recipes are unlocked.
 
@@ -91,7 +91,7 @@ With **Sort by: Category** toggled on, you can interact with a vertical row of b
 
 <table>
 <tr>
-<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/rail-forge.png" width="70" alt="Forge category buttons with Weapons off"></td>
+<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/rail-forge.png" width="70" alt="Forge category buttons with Weapons off"></td>
 <td>
 
 **Workbench, Forge, Black Forge, Galdr Table, Artisan Table**
@@ -101,7 +101,7 @@ Tools, Materials, Weapons and Armor. Click the small arrow on different buttons 
 </td>
 </tr>
 <tr>
-<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/rail-cauldron.png" width="62" alt="Cauldron category buttons with Health and Eitr on"></td>
+<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/rail-cauldron.png" width="62" alt="Cauldron category buttons with Health and Eitr on"></td>
 <td>
 
 **Cauldron, Food Preparation Table**
@@ -111,7 +111,7 @@ Health, Stamina, Eitr and Balanced food, as well as miscellaneous options for th
 </td>
 </tr>
 <tr>
-<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/rail-ketill.png" width="62" alt="Mead Ketill category buttons with Health only"></td>
+<td align="center"><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/rail-ketill.png" width="62" alt="Mead Ketill category buttons with Health only"></td>
 <td>
 
 **Mead Ketill**
@@ -128,7 +128,7 @@ Health, Stamina and Eitr meads, as well as categories for Resistance meads and U
 
 <table>
 <tr>
-<td><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/checklist.png" width="600" alt="Weapons checklist open"></td>
+<td><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/checklist.png" width="600" alt="Weapons checklist open"></td>
 <td>
 
 At stations with large lists of weapons, armor, and material craftables, you can click a small arrow next to one of the category buttons to open a filter checklist. Check or click-and-drag to toggle on and off only what you want to see.
@@ -147,7 +147,7 @@ At stations with large lists of weapons, armor, and material craftables, you can
 
 <table>
 <tr>
-<td><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/search.png" width="700" alt="Searching for pickaxes at the forge"></td>
+<td><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/search.png" width="700" alt="Searching for pickaxes at the forge"></td>
 <td>
 
 A search box at the top of the list filters by item name in real-time as you type.
@@ -188,7 +188,7 @@ Any item can be moved to a different biome with an override (see Configuration).
 
 Settings are in the mod config menu (<kbd>F1</kbd>), which needs a Configuration Manager mod. Sizes are percentages with **100% as the default**, and ranges are capped so nothing extends past the crafting panel.
 
-<p><img src="https://raw.githubusercontent.com/bazilisx/CraftingAndCookingDecluttered/main/images/config.png" width="700" alt="F1 config menu"></p>
+<p><img src="https://raw.githubusercontent.com/bazilisx/Declutter/main/images/config.png" width="700" alt="F1 config menu"></p>
 
 ### 1 - Buttons
 
@@ -218,12 +218,12 @@ Settings are in the mod config menu (<kbd>F1</kbd>), which needs a Configuration
 <table>
 <tr><td><b>Setting</b></td><td align="center"><b>Default</b></td><td><b>Description</b></td></tr>
 <tr><td>ToolbarOffset<br>CategoryOffset</td><td align="center">0,&nbsp;0</td><td>Nudges the toolbar or category buttons if another UI mod moves the crafting panel.</td></tr>
-<tr><td>DumpCsv</td><td align="center">Off</td><td>Writes <code>BepInEx/config/CraftingAndCookingDecluttered.dump.csv</code>, listing every recipe's biome, category and source.</td></tr>
+<tr><td>DumpCsv</td><td align="center">Off</td><td>Writes <code>BepInEx/config/Declutter.dump.csv</code>, listing every recipe's biome, category and source.</td></tr>
 </table>
 
 ### Overrides
 
-To move an item to a different biome, add a line to `BepInEx/config/CraftingAndCookingDecluttered.overrides.txt`:
+To move an item to a different biome, add a line to `BepInEx/config/Declutter.overrides.txt`:
 
 ```ini
 # PrefabName = Biome
@@ -257,7 +257,7 @@ If a UI mod moves the crafting panel, the toolbar should follow it. Use offset s
 
 **Mod manager:** install with r2modman, Gale or Thunderstore Mod Manager.
 
-**Manual:** install [BepInExPack Valheim](https://thunderstore.io/c/valheim/p/denikson/BepInExPack_Valheim/), then put `CraftingAndCookingDecluttered.dll` in `BepInEx/plugins`.
+**Manual:** install [BepInExPack Valheim](https://thunderstore.io/c/valheim/p/denikson/BepInExPack_Valheim/), then put `Declutter.dll` in `BepInEx/plugins`.
 
 ---
 
