@@ -167,7 +167,7 @@ A search box at the top of the list filters by item name in real-time as you typ
 ## Other features
 
 - **Click and drag** works on the biome buttons and category buttons too for bulk toggle on/off states.
-- **Primary buttons combine** and sort in the following order: 1) biome, 2) craftables, 3) category, 4) alphabetical.
+- **Primary buttons combine.** With Alphabetical on, everything visible is A-Z: under each biome header if Biome is on, and split into craftable then uncraftable if Craftable first is on. Category only filters what you see. With Alphabetical off, Category groups items by category instead.
 - **Saved per station:** meaning that your choices, decisions to hide early-game biome foods, and/or hatred for spears carries over across sessions.
 
 ---
