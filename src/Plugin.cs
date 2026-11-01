@@ -101,9 +101,9 @@ namespace CraftingAndCookingDecluttered
                 return e;
             }
             const string buttons = "1 - Buttons", listSec = "2 - Recipe list", adv = "3 - Advanced";
-            buttonScale = Setting(buttons, "Button size %", 100, "Size of every toolbar and rail button (both always match). Capped so the toolbar never runs past the crafting panel.", new AcceptableValueRange<int>(60, 200));
+            buttonScale = Setting(buttons, "Button size %", 100, "Size of every toolbar and category button (both always match). Capped so the toolbar never runs past the crafting panel.", new AcceptableValueRange<int>(60, 200));
             iconScale = Setting(buttons, "Icon size %", 100, "Size of the icon inside each button.", new AcceptableValueRange<int>(60, 125));
-            buttonSpacing = Setting(buttons, "Button spacing", 0, "Gap between neighbouring buttons on the toolbar and the rail, in pixels. 0 = frames touch.", new AcceptableValueRange<int>(0, 10));
+            buttonSpacing = Setting(buttons, "Button spacing", 0, "Gap between neighbouring buttons on the toolbar and the category buttons, in pixels. 0 = frames touch.", new AcceptableValueRange<int>(0, 10));
             biomeRows = Setting(buttons, "Biome rows", 1, "1 = all nine biome buttons in one row. 2 = two rows (5 + 4), for narrow screens or big buttons.", new AcceptableValueList<int>(1, 2));
             itemText = Setting(listSec, "Item text size %", 100, "Recipe names in the list.", new AcceptableValueRange<int>(60, 140));
             itemSpacing = Setting(listSec, "Item spacing %", 100, "Space from one recipe row to the next.", new AcceptableValueRange<int>(90, 150));
@@ -114,7 +114,7 @@ namespace CraftingAndCookingDecluttered
             headerIconGap = Setting(listSec, "Header icon gap", 5, "Space between a header's icon and its text, in pixels.", new AcceptableValueRange<int>(0, 20));
             dumpCsv = Config.Bind(adv, "DumpCsv", false, new ConfigDescription("Write BepInEx/config/CraftingAndCookingDecluttered.dump.csv the first time a crafting menu opens, listing every recipe's biome and category and where each came from. Handy for bug reports and for writing overrides.", null, new ConfigurationManagerAttributes { Order = order--, IsAdvanced = true }));
             toolbarOffset = Setting(adv, "ToolbarOffset", Vector2.zero, "Nudge the sort/biome toolbar (pixels) if it sits in the wrong spot.");
-            railOffset = Setting(adv, "RailOffset", Vector2.zero, "Nudge the category rail (pixels) if it sits in the wrong spot.");
+            railOffset = Setting(adv, "CategoryOffset", Vector2.zero, "Nudge the category buttons (pixels) if it sits in the wrong spot.");
             var hidden = new ConfigurationManagerAttributes { Browsable = false };
             ConfigEntry<string> State(string key) => Config.Bind("State", key, "", new ConfigDescription("Managed in game.", null, hidden));
             hiddenBiomesCfg = State("HiddenBiomes");

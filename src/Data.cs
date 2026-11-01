@@ -217,15 +217,19 @@ namespace CraftingAndCookingDecluttered
         }
 
         // Only what's needed to craft it: upgrade-only inputs (idols, amount 0 at level 1) don't gate crafting.
-        // "Any one of" recipes (raw fish from any fish) unlock with their earliest ingredient, not their latest.
+        // Raw fish is made from any one fish, so it unlocks with the earliest one, not the latest.
+        // Other "any one of" recipes are left alone until checked against the wiki.
+        static readonly HashSet<string> earliestIngredient = new HashSet<string> { "FishRaw" };
+
         static int Ingredients(Recipe r)
         {
+            bool anyOne = r.m_requireOnlyOneIngredient && earliestIngredient.Contains(r.m_item.name);
             int t = Unknown;
             foreach (var req in r.m_resources)
             {
                 if (!req.m_resItem || req.m_upgraderResource || req.m_amount <= 0) continue;
                 int i = OfItem(req.m_resItem.name);
-                t = r.m_requireOnlyOneIngredient ? MinKnown(t, i) : MaxKnown(t, i);
+                t = anyOne ? MinKnown(t, i) : MaxKnown(t, i);
             }
             return t;
         }
