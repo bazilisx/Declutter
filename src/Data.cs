@@ -213,8 +213,12 @@ namespace Declutter
             // Never earlier than what it's made from: the wiki lists seasonal Pointy Hat under Meadows, but it needs Bronze.
             // (No recipe in the wiki's own recipe data contradicts its wiki biome, so only recipes
             // the wiki lacks or that mods change can move.)
-            return Wiki(name, out t) ? MaxKnown(t, made) : made;
+            int tier = Wiki(name, out t) ? MaxKnown(t, made) : made;
+            return notBefore.TryGetValue(name, out var b) ? MaxKnown(tier, Rank(b)) : tier;
         }
+
+        // Raw fish is made at the Food Preparation Table, which needs Iron, so it can't be crafted before the Swamp.
+        static readonly Dictionary<string, Biome> notBefore = new Dictionary<string, Biome> { ["FishRaw"] = Biome.Swamp };
 
         // Only what's needed to craft it: upgrade-only inputs (idols, amount 0 at level 1) don't gate crafting.
         // Raw fish is made from any one fish, so it unlocks with the earliest one, not the latest.
