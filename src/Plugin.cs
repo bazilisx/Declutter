@@ -19,7 +19,7 @@ namespace Declutter
     {
         public const string Guid = "bazilisx.Declutter";
         public const string Name = "Declutter";
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
 
         internal static BepInEx.Logging.ManualLogSource Log;
         static ConfigEntry<bool> dumpCsv;
@@ -327,6 +327,7 @@ namespace Declutter
             }
 
             // Biome sections -> craftable before uncraftable (if on) -> category -> A-Z (if on) or the game's own order.
+            // Item types (axes, bows...) only group within a category when A-Z is off; with A-Z on each category is one A-Z list.
             var order = GroupOrder();
             var rows = list.Cast<object>().Select((p, index) =>
             {
@@ -337,7 +338,7 @@ namespace Declutter
                     index,
                     biome = byBiome ? Biomes.OfRecipe(r) : 0,
                     group = byCat ? Array.IndexOf(order, Group(r)) : 0,
-                    sub = byCat ? Categories.SubLabel(Categories.Of(r.m_item)) : "",
+                    sub = byCat && !alpha ? Categories.SubLabel(Categories.Of(r.m_item)) : "",
                     canCraft = (bool)pairCanCraft.GetValue(p),
                     name = alpha ? Localization.instance.Localize(r.m_item.m_itemData.m_shared.m_name) : "",
                     element = (GameObject)pairElement.GetValue(p),
