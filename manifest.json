@@ -1,6 +1,6 @@
 {
   "name": "Declutter",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "website_url": "https://github.com/bazilisx/Declutter",
   "description": "Cut through the clutter and find what you need faster. Sort, filter, and search all crafting and cooking menus by category, biome, and availability. Works at every crafting station, including cauldrons, kettles, and with most popular mods.",
   "dependencies": [
